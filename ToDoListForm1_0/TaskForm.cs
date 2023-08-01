@@ -56,10 +56,12 @@ namespace ToDoListForm1_0
 
         private void deleteButton_Click(object sender, EventArgs e)
         {
-            //After showing a confirm dialog:
-            mainForm.taskList.Remove(mainForm.taskList[editNum]);
-            mainForm.RefreshTaskPanel();
-
+            DialogResult result = MessageBox.Show("Delete This Task?", "Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (result == DialogResult.Yes)
+            {
+                mainForm.taskList.Remove(mainForm.taskList[editNum]);
+                mainForm.RefreshTaskPanel();
+            }
             this.Close();
         }
 

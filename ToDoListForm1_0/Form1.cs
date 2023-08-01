@@ -90,10 +90,13 @@ namespace ToDoListForm1_0
 
         private void deleteButton_Click(object sender, EventArgs e)
         {
-            //After confirm dialog
-            RemoveList();
-            ScanTaskLists();
-            TaskPanelVisible(false);
+            DialogResult result = MessageBox.Show("Delete This List?", "Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (result == DialogResult.Yes)
+            {
+                RemoveList();
+                ScanTaskLists();
+                TaskPanelVisible(false);
+            }
         }
 
         private void RemoveList()
@@ -247,9 +250,11 @@ namespace ToDoListForm1_0
             {
                 Dock = DockStyle.Fill,
                 Font = stdFont,
+                Tag = taskContainers.IndexOf(taskContainer),
                 Text = task.Label,
                 Checked = task.Check
             };
+            taskBox.Click += TaskBox_Click;
             taskContainer.Panel1.Controls.Add(taskBox);
             Button showButton = new Button
             {
@@ -305,6 +310,13 @@ namespace ToDoListForm1_0
             TaskForm taskForm = new TaskForm(taskList[i], i);
             taskForm.mainForm = this;
             taskForm.ShowDialog();
+        }
+
+        private void TaskBox_Click(object sender, EventArgs e)
+        {
+            CheckBox taskBox = sender as CheckBox;
+            int i = Convert.ToInt32(taskBox.Tag);
+            taskList[i].Check = taskBox.Checked;
         }
     }
 
