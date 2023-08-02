@@ -13,7 +13,7 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
     <IsWebBootstrapper>false</IsWebBootstrapper>
-    <PublishUrl>D:\MyForms\</PublishUrl>
+    <PublishUrl>D:\MyForms\TodoListApp\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
     <UpdateEnabled>false</UpdateEnabled>
@@ -23,7 +23,7 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>1</ApplicationRevision>
+    <ApplicationRevision>2</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -49,16 +49,22 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>537A8CAA2F0C645E427D0519993F4FE24E03F044</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>9BA22894085E038E12012099E1A05C0EB254D072</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile>ToDoListForm1_0_TemporaryKey.pfx</ManifestKeyFile>
+    <ManifestKeyFile>ToDoListForm1_0_1_TemporaryKey.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
     <GenerateManifests>true</GenerateManifests>
   </PropertyGroup>
   <PropertyGroup>
     <SignManifests>true</SignManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>ToDoListForm1_0_TemporaryKey.pfx</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System">
@@ -130,6 +136,7 @@
     <None Include="TodoDBDataSet.xss">
       <DependentUpon>TodoDBDataSet.xsd</DependentUpon>
     </None>
+    <None Include="ToDoListForm1_0_1_TemporaryKey.pfx" />
     <None Include="ToDoListForm1_0_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>

@@ -104,6 +104,7 @@
             // 
             // listFlow
             // 
+            this.listFlow.AutoScroll = true;
             this.listFlow.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.listFlow.Dock = System.Windows.Forms.DockStyle.Fill;
             this.listFlow.Location = new System.Drawing.Point(35, 75);
@@ -113,6 +114,7 @@
             // 
             // taskFlow
             // 
+            this.taskFlow.AutoScroll = true;
             this.taskFlow.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.taskFlow.Dock = System.Windows.Forms.DockStyle.Fill;
             this.taskFlow.Location = new System.Drawing.Point(267, 75);

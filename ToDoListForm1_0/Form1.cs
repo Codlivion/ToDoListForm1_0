@@ -22,7 +22,7 @@ namespace ToDoListForm1_0
         List<SplitContainer> taskContainers = new List<SplitContainer>();
 
         Font stdFont = new Font("Arial", 12);
-        Size splitSize = new Size(492, 36);
+        Size splitSize = new Size(488, 36);
         Size listSize = new Size(184, 20);
 
         public MainForm()
@@ -242,7 +242,7 @@ namespace ToDoListForm1_0
             SplitContainer taskContainer = new SplitContainer
             {
                 Size = splitSize,
-                SplitterDistance = 393
+                SplitterDistance = 388
             };
             taskFlow.Controls.Add(taskContainer);
             taskContainers.Add(taskContainer);
