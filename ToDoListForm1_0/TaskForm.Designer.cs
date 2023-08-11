@@ -81,6 +81,7 @@
             this.tasklabelBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tasklabelBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
             this.tasklabelBox.Location = new System.Drawing.Point(51, 67);
+            this.tasklabelBox.MaxLength = 32;
             this.tasklabelBox.Name = "tasklabelBox";
             this.tasklabelBox.Size = new System.Drawing.Size(378, 26);
             this.tasklabelBox.TabIndex = 1;
@@ -89,6 +90,7 @@
             // 
             this.taskdetailsBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.taskdetailsBox.Location = new System.Drawing.Point(51, 99);
+            this.taskdetailsBox.MaxLength = 128;
             this.taskdetailsBox.Multiline = true;
             this.taskdetailsBox.Name = "taskdetailsBox";
             this.taskdetailsBox.Size = new System.Drawing.Size(378, 138);

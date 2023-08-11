@@ -12,16 +12,24 @@ namespace ToDoListForm1_0
 {
     public partial class TaskForm : Form
     {
-        public MainForm mainForm;
+        public MainForm mainForm; //MainForm instance
 
         bool editMode;
         int editNum;
 
+        /// <summary>
+        /// Used to add new Task when called parameterless.
+        /// </summary>
         public TaskForm()
         {
             InitializeComponent();
         }
 
+        /// <summary>
+        /// Used to show and edit Task when called with a Task object and it's index in the taskList.
+        /// </summary>
+        /// <param name="task"></param>
+        /// <param name="index"></param>
         public TaskForm(Task task, int index)
         {
             InitializeComponent();
@@ -38,7 +46,25 @@ namespace ToDoListForm1_0
 
         private void addButton_Click(object sender, EventArgs e)
         {
-            //Check if all input fields are valid
+            if (tasklabelBox.Text == string.Empty)
+            {
+                MessageBox.Show("Task Label cannot be empty!");
+                return;
+            }
+
+            if (tasklabelBox.Text.Length > 32)
+            {
+                MessageBox.Show("Task Label exceeds the character limit!");
+                return;
+            }
+
+            if (taskdetailsBox.Text.Length > 128)
+            {
+                MessageBox.Show("Task Details exceeds the character limit!");
+                return;
+            }
+
+
             if (editMode)
             {
                 mainForm.taskList[editNum].Label = tasklabelBox.Text;

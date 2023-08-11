@@ -13,13 +13,13 @@ namespace ToDoListForm1_0
 {
     public partial class MainForm : Form
     {
-        string connectionString;
+        string connectionString = "Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\\TodoDB.mdf;Integrated Security=True";
 
-        int listID;
+        int listID; //Represents the current Task List.
 
-        public List<Task> taskList = new List<Task>();
-        public List<Button> listRefs = new List<Button>();
-        List<SplitContainer> taskContainers = new List<SplitContainer>();
+        public List<Task> taskList = new List<Task>(); //Stores a list of Task objects.
+        public List<Button> listRefs = new List<Button>(); //Stores the Controls created.
+        List<SplitContainer> taskContainers = new List<SplitContainer>(); //Stores the Controls created.
 
         Font stdFont = new Font("Arial", 12);
         Size splitSize = new Size(488, 36);
@@ -28,16 +28,19 @@ namespace ToDoListForm1_0
         public MainForm()
         {
             InitializeComponent();
-            connectionString = "Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\\TodoDB.mdf;Integrated Security=True";
             ScanTaskLists();
             TaskPanelVisible(false);
         }
 
+        /// <summary>
+        /// Hide and Show the Controls related to creating Tasks.
+        /// </summary>
+        /// <param name="visible">Set true to show and false to hide.</param>
         private void TaskPanelVisible(bool visible)
         {
-            buttonsSplit.Visible = visible ? true : false;
-            listnameSplit.Visible = visible ? true : false;
-            taskFlow.Visible = visible ? true : false;
+            buttonsSplit.Visible = visible;
+            listnameSplit.Visible = visible;
+            taskFlow.Visible = visible;
         }
 
         private void newlistButton_Click(object sender, EventArgs e)
@@ -57,6 +60,9 @@ namespace ToDoListForm1_0
             RefreshTaskPanel();
         }
 
+        /// <summary>
+        /// Adds each Task in the current Task List to the taskList.
+        /// </summary>
         private void FillTaskList()
         {
             using (SqlConnection connection = new SqlConnection(connectionString))
@@ -99,6 +105,9 @@ namespace ToDoListForm1_0
             }
         }
 
+        /// <summary>
+        /// Deletes the current Task List.
+        /// </summary>
         private void RemoveList()
         {
             using (SqlConnection connection = new SqlConnection(connectionString))
@@ -114,6 +123,9 @@ namespace ToDoListForm1_0
             }
         }
 
+        /// <summary>
+        /// Creates an empty new Task List.
+        /// </summary>
         private void NewList()
         {
             TaskPanelVisible(true);
@@ -133,6 +145,9 @@ namespace ToDoListForm1_0
             }
         }
 
+        /// <summary>
+        /// Scans the Database for Task Lists and rearranges the Panel on the left to show them properly.
+        /// </summary>
         private void ScanTaskLists()
         {
             List<KeyValuePair<int, string>> idNames = new List<KeyValuePair<int, string>>();
@@ -180,6 +195,9 @@ namespace ToDoListForm1_0
             }
         }
 
+        /// <summary>
+        /// Pushes the current Task List and it's Tasks into the Database.
+        /// </summary>
         public void SaveTaskList()
         {
             if (listID == 0) return;
@@ -222,6 +240,11 @@ namespace ToDoListForm1_0
             }
         }
 
+        /// <summary>
+        /// Creates a Button to reference the a Task List.
+        /// </summary>
+        /// <param name="id">Task List's list_ID in the Database.</param>
+        /// <param name="name">Task List's list_name in the Database.</param>
         private void CreateListRef(int id, string name)
         {
             Button listRef = new Button
@@ -237,6 +260,10 @@ namespace ToDoListForm1_0
             listRefs.Add(listRef);
         }
 
+        /// <summary>
+        /// Creates a new Container with a Checkbox and a Button inside, placed in a FlowLayoutPanel.
+        /// </summary>
+        /// <param name="task">Task object to be referenced.</param>
         public void NewTaskBox(Task task)
         {
             SplitContainer taskContainer = new SplitContainer
@@ -267,6 +294,9 @@ namespace ToDoListForm1_0
             taskContainer.Panel2.Controls.Add(showButton);
         }
 
+        /// <summary>
+        /// Rearranges the Controls so the current taskList is shown properly.
+        /// </summary>
         public void RefreshTaskPanel()
         {
             if (taskContainers.Count(c => c.Visible) > taskList.Count)
@@ -320,6 +350,9 @@ namespace ToDoListForm1_0
         }
     }
 
+    /// <summary>
+    /// Task object.
+    /// </summary>
     public class Task
     {
         public string Label { get; set; }
