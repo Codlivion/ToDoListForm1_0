@@ -1,11 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace ToDoListForm1_0
@@ -76,8 +69,7 @@ namespace ToDoListForm1_0
                 mainForm.taskList.Add(task);
             }
 
-            mainForm.RefreshTaskPanel();
-            this.Close();
+            Close();
         }
 
         private void deleteButton_Click(object sender, EventArgs e)
@@ -86,14 +78,14 @@ namespace ToDoListForm1_0
             if (result == DialogResult.Yes)
             {
                 mainForm.taskList.Remove(mainForm.taskList[editNum]);
-                mainForm.RefreshTaskPanel();
             }
-            this.Close();
+
+            Close();
         }
 
         private void cancelButton_Click(object sender, EventArgs e)
         {
-            this.Close();
+            Close();
         }
     }
 }

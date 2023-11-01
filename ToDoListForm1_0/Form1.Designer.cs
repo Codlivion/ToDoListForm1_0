@@ -86,7 +86,7 @@
             this.newlistButton.TabIndex = 0;
             this.newlistButton.Text = "NEW LIST";
             this.newlistButton.UseVisualStyleBackColor = true;
-            this.newlistButton.Click += new System.EventHandler(this.newlistButton_Click);
+            this.newlistButton.Click += new System.EventHandler(this.NewListClick);
             // 
             // mylistsLabel
             // 
@@ -111,6 +111,8 @@
             this.listFlow.Name = "listFlow";
             this.listFlow.Size = new System.Drawing.Size(194, 486);
             this.listFlow.TabIndex = 2;
+            this.listFlow.Paint += new System.Windows.Forms.PaintEventHandler(this.DrawListPanel);
+            this.listFlow.MouseClick += new System.Windows.Forms.MouseEventHandler(this.ListPanelClick);
             // 
             // taskFlow
             // 
@@ -121,6 +123,8 @@
             this.taskFlow.Name = "taskFlow";
             this.taskFlow.Size = new System.Drawing.Size(498, 486);
             this.taskFlow.TabIndex = 3;
+            this.taskFlow.Paint += new System.Windows.Forms.PaintEventHandler(this.DrawTaskPanel);
+            this.taskFlow.MouseClick += new System.Windows.Forms.MouseEventHandler(this.TaskPanelClick);
             // 
             // listnameSplit
             // 
@@ -159,7 +163,7 @@
             this.updateButton.TabIndex = 0;
             this.updateButton.Text = "Update";
             this.updateButton.UseVisualStyleBackColor = true;
-            this.updateButton.Click += new System.EventHandler(this.updateButton_Click);
+            this.updateButton.Click += new System.EventHandler(this.UpdateClick);
             // 
             // buttonsSplit
             // 
@@ -188,7 +192,7 @@
             this.newtaskButton.TabIndex = 0;
             this.newtaskButton.Text = "New Task";
             this.newtaskButton.UseVisualStyleBackColor = true;
-            this.newtaskButton.Click += new System.EventHandler(this.newtaskButton_Click);
+            this.newtaskButton.Click += new System.EventHandler(this.NewTaskClick);
             // 
             // deleteButton
             // 
@@ -200,7 +204,7 @@
             this.deleteButton.TabIndex = 1;
             this.deleteButton.Text = "Delete";
             this.deleteButton.UseVisualStyleBackColor = true;
-            this.deleteButton.Click += new System.EventHandler(this.deleteButton_Click);
+            this.deleteButton.Click += new System.EventHandler(this.DeleteClick);
             // 
             // MainForm
             // 

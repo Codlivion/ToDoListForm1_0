@@ -1,12 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Data.SqlClient;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace ToDoListForm1_0
@@ -18,17 +13,16 @@ namespace ToDoListForm1_0
         int listID; //Represents the current Task List.
 
         public List<Task> taskList = new List<Task>(); //Stores a list of Task objects.
-        public List<Button> listRefs = new List<Button>(); //Stores the Controls created.
-        List<SplitContainer> taskContainers = new List<SplitContainer>(); //Stores the Controls created.
+        public List<(int, string)> listRefs = new List<(int, string)>(); //ID-Name Tuples for Lists.
 
         Font stdFont = new Font("Arial", 12);
-        Size splitSize = new Size(488, 36);
+        Size taskSize = new Size(488, 36);
         Size listSize = new Size(184, 20);
 
         public MainForm()
         {
             InitializeComponent();
-            ScanTaskLists();
+            ScanLists();
             TaskPanelVisible(false);
         }
 
@@ -43,27 +37,82 @@ namespace ToDoListForm1_0
             taskFlow.Visible = visible;
         }
 
-        private void newlistButton_Click(object sender, EventArgs e)
+        private void NewListClick(object sender, EventArgs e)
         {
             NewList();
-            ScanTaskLists();
+            ScanLists();
         }
 
-        private void ListRef_Click(object sender, EventArgs e)
+        private void NewTaskClick(object sender, EventArgs e)
         {
-            Button listRef = sender as Button;
-            listnameBox.Text = listRef.Text;
-            listID = Convert.ToInt32(listRef.Tag);
+            TaskForm taskForm = new TaskForm();
+            taskForm.mainForm = this;
+            taskForm.ShowDialog();
+            taskFlow.Invalidate();
+        }
+
+        private void UpdateClick(object sender, EventArgs e)
+        {
+            SaveTaskList();
+            ScanLists();
+        }
+
+        private void DeleteClick(object sender, EventArgs e)
+        {
+            DialogResult result = MessageBox.Show("Delete This List?", "Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (result == DialogResult.Yes)
+            {
+                RemoveList();
+                ScanLists();
+                TaskPanelVisible(false);
+            }
+        }
+
+        /// <summary>
+        /// Creates an empty new Task List.
+        /// </summary>
+        private void NewList()
+        {
             TaskPanelVisible(true);
+            listnameBox.Text = "New List";
             taskList.Clear();
-            FillTaskList();
-            RefreshTaskPanel();
+            taskFlow.Invalidate();
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+
+                string insertList = "INSERT INTO TaskList (list_name) VALUES ('New List'); SELECT SCOPE_IDENTITY();";
+                using (SqlCommand command = new SqlCommand(insertList, connection))
+                {
+                    listID = Convert.ToInt32(command.ExecuteScalar());
+                }
+            }
+            listFlow.Invalidate();
+        }
+
+        /// <summary>
+        /// Deletes the current Task List.
+        /// </summary>
+        private void RemoveList()
+        {
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+
+                string deleteList = "DELETE FROM TaskList WHERE list_ID = @list_ID;";
+                using (SqlCommand command = new SqlCommand(deleteList, connection))
+                {
+                    command.Parameters.AddWithValue("@list_ID", listID);
+                    command.ExecuteNonQuery();
+                }
+            }
         }
 
         /// <summary>
         /// Adds each Task in the current Task List to the taskList.
         /// </summary>
-        private void FillTaskList()
+        private void FillTasks()
         {
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
@@ -88,69 +137,12 @@ namespace ToDoListForm1_0
             }
         }
 
-        private void updateButton_Click(object sender, EventArgs e)
-        {
-            SaveTaskList();
-            ScanTaskLists();
-        }
-
-        private void deleteButton_Click(object sender, EventArgs e)
-        {
-            DialogResult result = MessageBox.Show("Delete This List?", "Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-            if (result == DialogResult.Yes)
-            {
-                RemoveList();
-                ScanTaskLists();
-                TaskPanelVisible(false);
-            }
-        }
-
         /// <summary>
-        /// Deletes the current Task List.
+        /// Scans the Database for Task Lists.
         /// </summary>
-        private void RemoveList()
+        private void ScanLists()
         {
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                connection.Open();
-
-                string deleteList = "DELETE FROM TaskList WHERE list_ID = @list_ID;";
-                using (SqlCommand command = new SqlCommand(deleteList, connection))
-                {
-                    command.Parameters.AddWithValue("@list_ID", listID);
-                    command.ExecuteNonQuery();
-                }
-            }
-        }
-
-        /// <summary>
-        /// Creates an empty new Task List.
-        /// </summary>
-        private void NewList()
-        {
-            TaskPanelVisible(true);
-            listnameBox.Text = "New List";
-            taskList.Clear();
-            RefreshTaskPanel();
-
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                connection.Open();
-
-                string insertList = "INSERT INTO TaskList (list_name) VALUES ('New List'); SELECT SCOPE_IDENTITY();";
-                using (SqlCommand command = new SqlCommand(insertList, connection))
-                {
-                    listID = Convert.ToInt32(command.ExecuteScalar());
-                }
-            }
-        }
-
-        /// <summary>
-        /// Scans the Database for Task Lists and rearranges the Panel on the left to show them properly.
-        /// </summary>
-        private void ScanTaskLists()
-        {
-            List<KeyValuePair<int, string>> idNames = new List<KeyValuePair<int, string>>();
+            listRefs.Clear();
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 connection.Open();
@@ -164,35 +156,12 @@ namespace ToDoListForm1_0
                         {
                             int id = reader.GetInt32(0);
                             string name = reader.GetString(1);
-                            idNames.Add(new KeyValuePair<int, string>(id, name));
+                            listRefs.Add((id, name));
                         }
                     }
                 }
             }
-
-            if (listRefs.Count(c => c.Visible) > idNames.Count)
-            {
-                for (int i = listRefs.Count(c => c.Visible) - 1; i >= idNames.Count; i--)
-                {
-                    listRefs[i].Tag = 0;
-                    listRefs[i].Text = "";
-                    listRefs[i].Visible = false;
-                }
-            }
-
-            for (int i = 0; i < idNames.Count; i++)
-            {
-                if (i < listRefs.Count)
-                {
-                    listRefs[i].Visible = true;
-                    listRefs[i].Tag = idNames[i].Key;
-                    listRefs[i].Text = idNames[i].Value;
-                }
-                else
-                {
-                    CreateListRef(idNames[i].Key, idNames[i].Value);
-                }
-            }
+            listFlow.Invalidate();
         }
 
         /// <summary>
@@ -240,131 +209,93 @@ namespace ToDoListForm1_0
             }
         }
 
-        /// <summary>
-        /// Creates a Button to reference the a Task List.
-        /// </summary>
-        /// <param name="id">Task List's list_ID in the Database.</param>
-        /// <param name="name">Task List's list_name in the Database.</param>
-        private void CreateListRef(int id, string name)
+        public void TaskPanelClick(object sender, MouseEventArgs e)
         {
-            Button listRef = new Button
+            int i = e.Y / taskSize.Height;
+            if (i < taskList.Count)
             {
-                Dock = DockStyle.None,
-                AutoSize = false,
-                Size = listSize,
-                Tag = id,
-                Text = name
-            };
-            listRef.Click += ListRef_Click;
-            listFlow.Controls.Add(listRef);
-            listRefs.Add(listRef);
-        }
-
-        /// <summary>
-        /// Creates a new Container with a Checkbox and a Button inside, placed in a FlowLayoutPanel.
-        /// </summary>
-        /// <param name="task">Task object to be referenced.</param>
-        public void NewTaskBox(Task task)
-        {
-            SplitContainer taskContainer = new SplitContainer
-            {
-                Size = splitSize,
-                SplitterDistance = 388
-            };
-            taskFlow.Controls.Add(taskContainer);
-            taskContainers.Add(taskContainer);
-            CheckBox taskBox = new CheckBox
-            {
-                Dock = DockStyle.Fill,
-                Font = stdFont,
-                Tag = taskContainers.IndexOf(taskContainer),
-                Text = task.Label,
-                Checked = task.Check
-            };
-            taskBox.Click += TaskBox_Click;
-            taskContainer.Panel1.Controls.Add(taskBox);
-            Button showButton = new Button
-            {
-                Dock = DockStyle.Fill,
-                Font = stdFont,
-                Tag = taskContainers.IndexOf(taskContainer),
-                Text = "Show",
-            };
-            showButton.Click += showButton_Click;
-            taskContainer.Panel2.Controls.Add(showButton);
-        }
-
-        /// <summary>
-        /// Rearranges the Controls so the current taskList is shown properly.
-        /// </summary>
-        public void RefreshTaskPanel()
-        {
-            if (taskContainers.Count(c => c.Visible) > taskList.Count)
-            {
-                for (int i = taskContainers.Count - 1; i >= taskList.Count; i--)
+                if (e.X < taskSize.Height)
                 {
-                    CheckBox taskBox = taskContainers[i].Panel1.Controls[0] as CheckBox;
-                    taskBox.Text = "";
-                    taskBox.Checked = false;
-                    taskContainers[i].Visible = false;
+                    taskList[i].Check = !taskList[i].Check;
+                }
+                else if (e.X > taskSize.Width * 3 / 4)
+                {
+                    TaskForm taskForm = new TaskForm(taskList[i], i);
+                    taskForm.mainForm = this;
+                    taskForm.ShowDialog();
+                }
+                taskFlow.Invalidate();
+            }
+        }
+
+        private void ListPanelClick(object sender, MouseEventArgs e)
+        {
+            int i = e.Y / listSize.Height;
+            if (i < listRefs.Count)
+            {
+                if (e.X < listSize.Width * 4 / 3)
+                {
+                    listnameBox.Text = listRefs[i].Item2;
+                    listID = listRefs[i].Item1;
+                    TaskPanelVisible(true);
+                    taskList.Clear();
+                    FillTasks();
+                    taskFlow.Invalidate();
+                    listFlow.Invalidate();
                 }
             }
+        }
 
+        public void DrawTaskPanel(object sender, PaintEventArgs e)
+        {
+            int width = taskSize.Width;
+            int height = taskSize.Height;
             for (int i = 0; i < taskList.Count; i++)
             {
-                if (i < taskContainers.Count)
-                {
-                    taskContainers[i].Visible = true;
-                    CheckBox taskBox = taskContainers[i].Panel1.Controls[0] as CheckBox;
-                    taskBox.Text = taskList[i].Label;
-                    taskBox.Checked = taskList[i].Check;
-                }
-                else
-                {
-                    NewTaskBox(taskList[i]);
-                }
+                Rectangle rect = new Rectangle(0, i * height, width, height);
+                Rectangle checkRect = new Rectangle(0, i * height, height, height);
+                Rectangle showRect = new Rectangle(width * 3 / 4, i * height, width * 1 / 4, height);
+                string check = taskList[i].Check ? "V" : " ";
+                e.Graphics.DrawRectangle(Pens.Gray, rect);
+                e.Graphics.DrawRectangle(Pens.Gray, checkRect);
+                e.Graphics.DrawRectangle(Pens.Gray, showRect);
+                e.Graphics.DrawString(check, stdFont, Brushes.Green, 10, i * height + 10);
+                e.Graphics.DrawString(taskList[i].Label, stdFont, Brushes.Black, height + 5, i * height + 10);
+                e.Graphics.DrawString("Show", stdFont, Brushes.Black, width * 3 / 4 + 5, i * height + 10);
             }
         }
 
-        private void newtaskButton_Click(object sender, EventArgs e)
+        public void DrawListPanel(object sender, PaintEventArgs e)
         {
-            TaskForm taskForm = new TaskForm();
-            taskForm.mainForm = this;
-            taskForm.ShowDialog();
-        }
-
-        private void showButton_Click(object sender, EventArgs e)
-        {
-            Button button = sender as Button;
-            int i = Convert.ToInt32(button.Tag);
-            TaskForm taskForm = new TaskForm(taskList[i], i);
-            taskForm.mainForm = this;
-            taskForm.ShowDialog();
-        }
-
-        private void TaskBox_Click(object sender, EventArgs e)
-        {
-            CheckBox taskBox = sender as CheckBox;
-            int i = Convert.ToInt32(taskBox.Tag);
-            taskList[i].Check = taskBox.Checked;
+            int width = listSize.Width;
+            int height = listSize.Height;
+            int a = -1;
+            for (int i = 0; i < listRefs.Count; i++)
+            {
+                if (listRefs[i].Item1 == listID) a = i;
+                else
+                {
+                    Rectangle rect = new Rectangle(0, i * height, width, height);
+                    e.Graphics.DrawRectangle(Pens.Gray, rect);
+                    e.Graphics.DrawString(listRefs[i].Item2, stdFont, Brushes.Black, 4, i * height + 4);
+                }
+            }
+            if (a != -1)
+            {
+                Rectangle aRect = new Rectangle(0, a * height, width, height);
+                e.Graphics.DrawRectangle(Pens.Green, aRect);
+                e.Graphics.DrawString(listRefs[a].Item2, stdFont, Brushes.Green, 2, a * height + 2);
+            }
         }
     }
 
-    /// <summary>
-    /// Task object.
-    /// </summary>
     public class Task
     {
         public string Label { get; set; }
         public bool Check { get; set; }
         public string Details { get; set; }
 
-        public Task()
-        {
-            Label = string.Empty;
-            Check = false;
-            Details = string.Empty;
-        }
+        public Task() { }
 
         public Task(string label, bool check, string details)
         {
