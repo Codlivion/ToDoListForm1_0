@@ -233,7 +233,7 @@ namespace ToDoListForm1_0
             int i = e.Y / listSize.Height;
             if (i < listRefs.Count)
             {
-                if (e.X < listSize.Width * 4 / 3)
+                if (e.X < listSize.Width * 3 / 4)
                 {
                     listnameBox.Text = listRefs[i].Item2;
                     listID = listRefs[i].Item1;
